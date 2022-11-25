@@ -58,8 +58,8 @@ module cpu(input clock, input reset);
     end
   end
   
-// TO FILL IN: Instantiate the Instruction Memory here 
-  
+// TO FILL IN: Instantiate the Instruction Memory here //done
+Memory cpu_IMem(clock, reset, 1'b1, 1'b0, PC >> 2, 32'b0, instr);
   
   
 
@@ -182,8 +182,8 @@ assign RegWriteAddr = (IDEX_RegDst==1'b0) ? IDEX_instr_rt : IDEX_instr_rd;
 /***************** Memory Unit (MEM)  ****************/  
 
 // Data memory 1KB
-// Instantiate the Data Memory here 
-
+// Instantiate the Data Memory here  //dobes
+ Memory cpu_DataMem(clock, reset, EXMEM_MemRead , EXMEM_MemWrite, EXMEM_ALUOut, EXMEM_MemWriteData, MEMWB_DMemOut);
 
 
 // MEMWB pipeline register
