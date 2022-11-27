@@ -214,5 +214,5 @@ assign RegWriteAddr = (IDEX_RegDst==1'b0) ? IDEX_instr_rt : IDEX_instr_rd;
 /***************** WriteBack Unit (WB)  ****************/  
 // TO FILL IN: Write Back logic 
 
-//Susp was here again...
+
 endmodule
