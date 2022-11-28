@@ -113,21 +113,27 @@ module Hazard_Unit(input ID/EX.RegisterRt,
                    input ID/EX.MemRead,
                    input Rs,
                    input Rt,
-                   output PCWrite,
-                   output selector,   //selector bit for multiplexer
-                   output IF/IDWrite);
+                   output wire PCWrite,
+                   output wire selector,     //selector bit for multiplexer
+                   output wire IF/IDWrite);
   always @(*) 
     begin
       if (ID/EX.MemRead == 1 && (ID/EX.RegisterRt == IF/ID.RegisterRs || ID/EX.RegisterRt == IF/ID.RegisterRt))
         begin
-          PCWrite = 1'b0; //Write Enable for PC = 0
-          IF/IDWrite = 1'b0; //Write Enable for IF/ID = 0
+          PCWrite = 1'b0;   //Write Enable for PC = 0
+          IF/IDWrite = 1'b0;  //Write Enable for IF/ID = 0
           selector = 1'b0;
+        end
+      else
+        begin
+          PCWrite = 1'b1;
+          IF/IDWrite = 1'b1;
+          selector = 1'b1;
         end
     end
 
-endmodule
-                       
+endmodule        
+
 /************** control for ALU control in EX pipe stage  *************/
 module control_alu(output reg [3:0] ALUOp,                  
                input [1:0] ALUcntrl,
