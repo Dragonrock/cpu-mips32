@@ -7,53 +7,104 @@ module control_main(output reg RegDst,
                 output reg MemWrite,  
                 output reg MemToReg,  
                 output reg ALUSrc,  
-                output reg RegWrite,  
+                output reg RegWrite,
+                output reg BranchCond,  
                 output reg [1:0] ALUcntrl,  
                 input [5:0] opcode);
 
   always @(*) 
    begin
      case (opcode)
-      `R_FORMAT: 
-      /* TO FILL IN: The control signal values in each and every case */
-          begin 
-            RegDst = 1'b1;
-            MemRead = 1'b0;
-            MemWrite = 1'b0;
-            MemToReg = 1'b0;
-            // ALUSrc = 
-            // RegWrite = 
-            // Branch =        
-            // ALUcntrl  =             
-          end
-       `LW :   
-           begin 
-            RegDst = 1'b0;
-            MemRead = 1'b1;
-            MemWrite = 1'b0;
-            MemToReg = 1'b1;
-            // .............
-           end
-        `SW :   
-           begin 
-            // .............
-           end
-       `BEQ:  
-           begin 
-            // .............
-           end
-       default:
-           begin
-            // .............
-           end
-      endcase
+      `R_FORMAT: begin
+        RegWrite = 1'b1;
+        RegDst = 1'b1;
+        AluSrc = 1'b0;
+        Branch = 1'b0;
+        BranchCond= 1'b0;
+        MemWrite = 1'b0;
+        MemRead = 1'b0;
+        MemToReg = 1'b0;
+        ALUcntrl = 2'b10;
+      end
+
+      `LW: begin
+        RegWrite = 1'b1;
+        RegDst = 1'b0;
+        AluSrc = 1'b1;
+        Branch = 1'b0;
+        BranchCond= 1'b0;
+        MemWrite = 1'b0;
+        MemRead = 1'b1;
+        MemToReg = 1'b1;
+        ALUcntrl = 2'b00;
+      end
+
+      `SW: begin
+        RegWrite = 1'b0;
+        RegDst = 1'bx;
+        AluSrc = 1'b1;
+        Branch = 1'b0;
+        BranchCond= 1'b0;
+        MemWrite = 1'b1;
+        MemRead = 1'b0;
+        MemToReg = 1'bx;
+        ALUcntrl = 2'b00;
+      end
+      
+      `BEQ: begin
+        RegWrite = 1'b0;
+        RegDst = 1'bx;
+        AluSrc = 1'b0;
+        Branch = 1'b1;
+        BranchCond= 1'b0;
+        MemWrite = 1'b0;
+        MemRead = 1'b0;
+        MemToReg = 1'bx;
+        ALUcntrl = 2'b01;
+      end
+
+      `BNE: begin
+        RegWrite = 1'b0;
+        RegDst = 1'bx;
+        AluSrc = 1'b0;
+        Branch = 1'b1;
+        BranchCond= 1'b1;
+        MemWrite = 1'b0;
+        MemRead = 1'b0;
+        MemToReg = 1'bx;
+        ALUcntrl = 2'b01;
+      end
+      `ADDI: begin
+        RegWrite = 1'b1;
+        RegDst = 1'b0;
+        AluSrc = 1'b1;
+        Branch = 1'b0;
+        BranchCond= 1'b0;
+        MemWrite = 1'b0;
+        MemRead = 1'b0;
+        MemToReg = 1'b0;
+        ALUcntrl = 2'b00;
+      end
+      
+      default: begin
+        RegWrite = 1'bx;
+        RegDst = 1'bx;
+        AluSrc = 1'bx;
+        Branch = 1'bx;
+        BranchCond= 1'bx;
+        MemWrite = 1'bx;
+        MemRead = 1'b0;
+        MemToReg = 1'bx;
+        ALUcntrl = 2'bxx;
+      end
+    endcase
     end // always
 endmodule
 
 
 /**************** Module for Bypass Detection in EX pipe stage goes here  *********/
 // TO FILL IN: Module details 
-endmodule          
+          
                        
 
 /**************** Module for Stall Detection in ID pipe stage goes here  *********/
