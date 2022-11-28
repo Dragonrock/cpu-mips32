@@ -109,7 +109,24 @@ endmodule
 
 /**************** Module for Stall Detection in ID pipe stage goes here  *********/
 // TO FILL IN: Module details 
+module Hazard_Unit(input ID/EX.RegisterRt,
+                   input ID/EX.MemRead,
+                   input Rs,
+                   input Rt,
+                   output PCWrite,
+                   output selector,   //selector bit for multiplexer
+                   output IF/IDWrite);
+  always @(*) 
+    begin
+      if (ID/EX.MemRead == 1 && (ID/EX.RegisterRt == IF/ID.RegisterRs || ID/EX.RegisterRt == IF/ID.RegisterRt))
+        begin
+          PCWrite = 1'b0; //Write Enable for PC = 0
+          IF/IDWrite = 1'b0; //Write Enable for IF/ID = 0
+          selector = 1'b0;
+        end
+    end
 
+endmodule
                        
 /************** control for ALU control in EX pipe stage  *************/
 module control_alu(output reg [3:0] ALUOp,                  
