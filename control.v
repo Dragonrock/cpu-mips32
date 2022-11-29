@@ -1,3 +1,4 @@
+
 `include "constants.h"
 
 /************** Main control in ID pipe stage  *************/
@@ -104,13 +105,62 @@ endmodule
 
 /**************** Module for Bypass Detection in EX pipe stage goes here  *********/
 // TO FILL IN: Module details 
-          
+module Forward_Unit (input EX/MEM.RegisterRd,
+                input EX/MEM.RegWrite,
+                input MEM/WB.RegisterRd,
+                input MEM/WB.RegWrite,
+                input ID/EX.RegisterRt,
+                input ID/EX.RegisterRs,
+                output ForwardA,
+                output ForwardB);
+
+  always @(*)
+    begin
+      if (EX/MEM.RegWrite == 1 && EX/MEM.RegisterRd != 0 && EX/MEM.RegisterRd == ID/EX.RegisterRs)
+        ForwardA <= 2'b10;
+      else if (MEM/WB.RegWrite == 1 && MEM/WB.RegisterRd != 0 && MEM/WB.RegisterRd == ID/EX.RegisterRs && (EX/MEM.RegisterRd != ID/EX.RegisterRs || EX/MEM.RegWrite == 0))
+        ForwardA <= 1'b1;
+      else
+        ForwardA <= 1'b0;
+
+      if (EX/MEM.RegWrite == 1 && EX/MEM.RegisterRd != 0 && EX/MEM.RegisterRd == ID/EX.RegisterRt)
+        ForwardB <= 2'b10;
+      else if (MEM/WB.RegWrite == 1 && MEM/WB.RegisterRd != 0 && MEM/WB.RegisterRd == ID/EX.RegisterRt && (EX/MEM.RegisterRd != ID/EX.RegisterRt || EX/MEM.RegWrite == 0))
+        ForwardB <= 1'b1;
+      else
+        ForwardB <= 1'b0;
+    end
+
+endmodule
                        
 
 /**************** Module for Stall Detection in ID pipe stage goes here  *********/
 // TO FILL IN: Module details 
+module Hazard_Unit(input ID/EX.RegisterRt,
+                   input ID/EX.MemRead,
+                   input Rs,
+                   input Rt,
+                   output wire PCWrite,
+                   output wire selector,     //selector bit for multiplexer
+                   output wire IF/IDWrite);
+  always @(*) 
+    begin
+      if (ID/EX.MemRead == 1 && (ID/EX.RegisterRt == IF/ID.RegisterRs || ID/EX.RegisterRt == IF/ID.RegisterRt))
+        beginhttps://dragonrock.github.io/Homepage/
+          PCWrite <= 1'b0;   //Write Enable for PC = 0
+          IF/IDWrite <= 1'b0;  //Write Enable for IF/ID = 0
+          selector <= 1'b0;
+        end
+      else
+        begin
+          PCWrite <= 1'b1;
+          IF/IDWrite <= 1'b1;
+          selector <= 1'b1;
+        end
+    end
 
-                       
+endmodule        
+
 /************** control for ALU control in EX pipe stage  *************/
 module control_alu(output reg [3:0] ALUOp,                  
                input [1:0] ALUcntrl,
