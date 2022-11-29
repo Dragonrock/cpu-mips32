@@ -1,3 +1,4 @@
+
 `include "constants.h"
 
 /************** Main control in ID pipe stage  *************/
@@ -145,7 +146,7 @@ module Hazard_Unit(input ID/EX.RegisterRt,
   always @(*) 
     begin
       if (ID/EX.MemRead == 1 && (ID/EX.RegisterRt == IF/ID.RegisterRs || ID/EX.RegisterRt == IF/ID.RegisterRt))
-        begin
+        beginhttps://dragonrock.github.io/Homepage/
           PCWrite <= 1'b0;   //Write Enable for PC = 0
           IF/IDWrite <= 1'b0;  //Write Enable for IF/ID = 0
           selector <= 1'b0;
