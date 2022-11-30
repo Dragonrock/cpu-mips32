@@ -115,24 +115,23 @@ module Forward_Unit (input [4:0] EX_MEM_RegisterRd,
       //Initializing forwarding signals to zero
       {ForwardA, ForwardB} <= 0;
 
-      if ((EX_MEM_RegWrite && EX_MEM_RegisterRd) &&         ///to try : reverse the if and else if and remove from current else if half the &&
-          (EX_MEM_RegisterRd == ID_EX_RegisterRs))
-        ForwardA <= 2'b10;
-      else if ((MEM_WB_RegWrite && MEM_WB_RegisterRd) && 
-              ((MEM_WB_RegisterRd == ID_EX_RegisterRs) &&
-              ((EX_MEM_RegisterRd != ID_EX_RegisterRs) || 
-              (!EX_MEM_RegWrite))))
-        ForwardA <= 1'b1;
+      
+      if ((MEM_WB_RegWrite && MEM_WB_RegisterRd) && 
+          (MEM_WB_RegisterRd == ID_EX_RegisterRs))
+        ForwardA <= 'd1;
+        
+      else if ((EX_MEM_RegWrite && EX_MEM_RegisterRd) && 
+              (EX_MEM_RegisterRd == ID_EX_RegisterRs))
+        ForwardA <= 'd2;
 
+      if ((MEM_WB_RegWrite && MEM_WB_RegisterRd) && 
+          (MEM_WB_RegisterRd == ID_EX_RegisterRt))
+        ForwardB <= 'd1;
+      
+      else if ((EX_MEM_RegWrite && EX_MEM_RegisterRd) && 
+               (EX_MEM_RegisterRd == ID_EX_RegisterRt))
+        ForwardB <= 'd2;
 
-      if ((EX_MEM_RegWrite && EX_MEM_RegisterRd) && 
-          (EX_MEM_RegisterRd == ID_EX_RegisterRt))
-        ForwardB <= 2'b10;
-      else if ((MEM_WB_RegWrite && MEM_WB_RegisterRd) && 
-              ((MEM_WB_RegisterRd == ID_EX_RegisterRt) && 
-              ((EX_MEM_RegisterRd != ID_EX_RegisterRt) || 
-              (EX_MEM_RegWrite == 0))))
-        ForwardB <= 1'b1;
     end
 
 endmodule

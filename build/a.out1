@@ -1,14 +1,12 @@
 **** module/scope: Forward_Unit
      Flip-Flops   : 0
-     Logic Gates  : 193
-     EQUALITY[5]: 10 units
-     EQUALITY[32]: 1 units
+     Logic Gates  : 104
+     EQUALITY[5]: 8 units
      MUX[2]: 8 slices
 **** TOTALS
      Flip-Flops   : 0
-     Logic Gates  : 193
-     EQUALITY[5]: 10 units
-     EQUALITY[32]: 1 units
+     Logic Gates  : 104
+     EQUALITY[5]: 8 units
      MUX[2]: 8 slices
 **** module/scope: Hazard_Unit
      Flip-Flops   : 0

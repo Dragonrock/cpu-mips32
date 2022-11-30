@@ -198,7 +198,7 @@ assign RegWriteAddr = (IDEX_RegDst==1'b0) ? IDEX_instr_rt : IDEX_instr_rd;
    // TO FILL IN: Instantiation of control logic for Forwarding goes here
   Forward_Unit forward(EXMEM_instr_rd,
                        EXMEM_RegWrite,
-                       MEMWB_instr_rd,
+                       MEMWB_RegWriteAddr,
                        MEMWB_RegWrite,
                        IDEX_instr_rt,
                        IDEX_instr_rs,
