@@ -1,5 +1,7 @@
 
 `include "constants.h"
+`timescale 1ns/1ps
+
 
 /************** Main control in ID pipe stage  *************/
 module control_main(output reg RegDst,
@@ -9,7 +11,6 @@ module control_main(output reg RegDst,
                 output reg MemToReg,  
                 output reg ALUSrc,  
                 output reg RegWrite,
-                output reg BranchCond,  
                 output reg [1:0] ALUcntrl,  
                 input [5:0] opcode);
 
@@ -19,9 +20,9 @@ module control_main(output reg RegDst,
       `R_FORMAT: begin
         RegWrite = 1'b1;
         RegDst = 1'b1;
-        AluSrc = 1'b0;
+
+        ALUSrc = 1'b0;
         Branch = 1'b0;
-        BranchCond= 1'b0;
         MemWrite = 1'b0;
         MemRead = 1'b0;
         MemToReg = 1'b0;
@@ -31,9 +32,8 @@ module control_main(output reg RegDst,
       `LW: begin
         RegWrite = 1'b1;
         RegDst = 1'b0;
-        AluSrc = 1'b1;
+        ALUSrc = 1'b1;
         Branch = 1'b0;
-        BranchCond= 1'b0;
         MemWrite = 1'b0;
         MemRead = 1'b1;
         MemToReg = 1'b1;
@@ -43,9 +43,8 @@ module control_main(output reg RegDst,
       `SW: begin
         RegWrite = 1'b0;
         RegDst = 1'bx;
-        AluSrc = 1'b1;
+        ALUSrc = 1'b1;
         Branch = 1'b0;
-        BranchCond= 1'b0;
         MemWrite = 1'b1;
         MemRead = 1'b0;
         MemToReg = 1'bx;
@@ -55,9 +54,8 @@ module control_main(output reg RegDst,
       `BEQ: begin
         RegWrite = 1'b0;
         RegDst = 1'bx;
-        AluSrc = 1'b0;
+        ALUSrc = 1'b0;
         Branch = 1'b1;
-        BranchCond= 1'b0;
         MemWrite = 1'b0;
         MemRead = 1'b0;
         MemToReg = 1'bx;
@@ -67,9 +65,8 @@ module control_main(output reg RegDst,
       `BNE: begin
         RegWrite = 1'b0;
         RegDst = 1'bx;
-        AluSrc = 1'b0;
+        ALUSrc = 1'b0;
         Branch = 1'b1;
-        BranchCond= 1'b1;
         MemWrite = 1'b0;
         MemRead = 1'b0;
         MemToReg = 1'bx;
@@ -78,9 +75,8 @@ module control_main(output reg RegDst,
       `ADDI: begin
         RegWrite = 1'b1;
         RegDst = 1'b0;
-        AluSrc = 1'b1;
+        ALUSrc = 1'b1;
         Branch = 1'b0;
-        BranchCond= 1'b0;
         MemWrite = 1'b0;
         MemRead = 1'b0;
         MemToReg = 1'b0;
@@ -90,9 +86,8 @@ module control_main(output reg RegDst,
       default: begin
         RegWrite = 1'bx;
         RegDst = 1'bx;
-        AluSrc = 1'bx;
+        ALUSrc = 1'bx;
         Branch = 1'bx;
-        BranchCond= 1'bx;
         MemWrite = 1'bx;
         MemRead = 1'b0;
         MemToReg = 1'bx;
@@ -105,30 +100,39 @@ endmodule
 
 /**************** Module for Bypass Detection in EX pipe stage goes here  *********/
 // TO FILL IN: Module details 
-module Forward_Unit (input EX/MEM.RegisterRd,
-                input EX/MEM.RegWrite,
-                input MEM/WB.RegisterRd,
-                input MEM/WB.RegWrite,
-                input ID/EX.RegisterRt,
-                input ID/EX.RegisterRs,
-                output ForwardA,
-                output ForwardB);
+module Forward_Unit (input [4:0] EX_MEM_RegisterRd,
+                     input EX_MEM_RegWrite,
+                     input [4:0] MEM_WB_RegisterRd,
+                     input MEM_WB_RegWrite,
+                     input [4:0] ID_EX_RegisterRt,
+                     input [4:0] ID_EX_RegisterRs,
+                     output reg [1:0] ForwardA,
+                     output reg [1:0] ForwardB);
 
   always @(*)
     begin
-      if (EX/MEM.RegWrite == 1 && EX/MEM.RegisterRd != 0 && EX/MEM.RegisterRd == ID/EX.RegisterRs)
-        ForwardA <= 2'b10;
-      else if (MEM/WB.RegWrite == 1 && MEM/WB.RegisterRd != 0 && MEM/WB.RegisterRd == ID/EX.RegisterRs && (EX/MEM.RegisterRd != ID/EX.RegisterRs || EX/MEM.RegWrite == 0))
-        ForwardA <= 1'b1;
-      else
-        ForwardA <= 1'b0;
 
-      if (EX/MEM.RegWrite == 1 && EX/MEM.RegisterRd != 0 && EX/MEM.RegisterRd == ID/EX.RegisterRt)
+      //Initializing forwarding signals to zero
+      {ForwardA, ForwardB} <= 0;
+
+      if ((EX_MEM_RegWrite && EX_MEM_RegisterRd) &&         ///to try : reverse the if and else if and remove from current else if half the &&
+          (EX_MEM_RegisterRd == ID_EX_RegisterRs))
+        ForwardA <= 2'b10;
+      else if ((MEM_WB_RegWrite && MEM_WB_RegisterRd) && 
+              ((MEM_WB_RegisterRd == ID_EX_RegisterRs) &&
+              ((EX_MEM_RegisterRd != ID_EX_RegisterRs) || 
+              (!EX_MEM_RegWrite))))
+        ForwardA <= 1'b1;
+
+
+      if ((EX_MEM_RegWrite && EX_MEM_RegisterRd) && 
+          (EX_MEM_RegisterRd == ID_EX_RegisterRt))
         ForwardB <= 2'b10;
-      else if (MEM/WB.RegWrite == 1 && MEM/WB.RegisterRd != 0 && MEM/WB.RegisterRd == ID/EX.RegisterRt && (EX/MEM.RegisterRd != ID/EX.RegisterRt || EX/MEM.RegWrite == 0))
+      else if ((MEM_WB_RegWrite && MEM_WB_RegisterRd) && 
+              ((MEM_WB_RegisterRd == ID_EX_RegisterRt) && 
+              ((EX_MEM_RegisterRd != ID_EX_RegisterRt) || 
+              (EX_MEM_RegWrite == 0))))
         ForwardB <= 1'b1;
-      else
-        ForwardB <= 1'b0;
     end
 
 endmodule
@@ -136,26 +140,28 @@ endmodule
 
 /**************** Module for Stall Detection in ID pipe stage goes here  *********/
 // TO FILL IN: Module details 
-module Hazard_Unit(input ID/EX.RegisterRt,
-                   input ID/EX.MemRead,
-                   input Rs,
-                   input Rt,
-                   output wire PCWrite,
-                   output wire selector,     //selector bit for multiplexer
-                   output wire IF/IDWrite);
+module Hazard_Unit(input [4:0] ID_EX_RegisterRt,
+                   input ID_EX_MemRead,
+                   input [4:0] IF_ID_RegisterRs,
+                   input [4:0] IF_ID_RegisterRt,
+                   output reg PCWrite,
+                   output reg IDEX_Control, //selector bit for multiplexer
+                   output reg IFID_Write);
   always @(*) 
     begin
-      if (ID/EX.MemRead == 1 && (ID/EX.RegisterRt == IF/ID.RegisterRs || ID/EX.RegisterRt == IF/ID.RegisterRt))
-        beginhttps://dragonrock.github.io/Homepage/
+      if ((ID_EX_MemRead) && 
+          ((ID_EX_RegisterRt == IF_ID_RegisterRs) || 
+          (ID_EX_RegisterRt == IF_ID_RegisterRt)))
+        begin
           PCWrite <= 1'b0;   //Write Enable for PC = 0
-          IF/IDWrite <= 1'b0;  //Write Enable for IF/ID = 0
-          selector <= 1'b0;
+          IFID_Write <= 1'b0;  //Write Enable for IF/ID = 0
+          IDEX_Control <= 1'b0;
         end
       else
         begin
           PCWrite <= 1'b1;
-          IF/IDWrite <= 1'b1;
-          selector <= 1'b1;
+          IFID_Write <= 1'b1;
+          IDEX_Control <= 1'b1;
         end
     end
 
