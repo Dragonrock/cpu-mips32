@@ -2,6 +2,7 @@
 `include "constants.h"
 `timescale 1ns/1ps
 
+
 /************** Main control in ID pipe stage  *************/
 module control_main(output reg RegDst,
                 output reg Branch,  
@@ -19,6 +20,7 @@ module control_main(output reg RegDst,
       `R_FORMAT: begin
         RegWrite = 1'b1;
         RegDst = 1'b1;
+
         ALUSrc = 1'b0;
         Branch = 1'b0;
         MemWrite = 1'b0;
@@ -131,7 +133,6 @@ module Forward_Unit (input [4:0] EX_MEM_RegisterRd,
               ((EX_MEM_RegisterRd != ID_EX_RegisterRt) || 
               (EX_MEM_RegWrite == 0))))
         ForwardB <= 1'b1;
-
     end
 
 endmodule
