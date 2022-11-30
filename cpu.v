@@ -8,7 +8,7 @@ module cpu(input clock, input reset);
  reg [31:0] IFID_PCplus4;
  reg [31:0] IFID_instr;
  reg [31:0] IDEX_rdA, IDEX_rdB, IDEX_signExtend;
- reg [4:0]  IDEX_instr_rt, IDEX_instr_rs, IDEX_instr_rd;                            
+ reg [4:0]  IDEX_instr_rt, IDEX_instr_rs, IDEX_instr_rd, IDEX_Shamt;                            
  reg        IDEX_RegDst, IDEX_ALUSrc;
  reg [1:0]  IDEX_ALUcntrl;
  reg        IDEX_Branch, IDEX_MemRead, IDEX_MemWrite; 
@@ -22,7 +22,7 @@ module cpu(input clock, input reset);
  reg [4:0]  MEMWB_RegWriteAddr, MEMWB_instr_rd; 
  reg [31:0] MEMWB_ALUOut;
  reg        MEMWB_MemToReg, MEMWB_RegWrite;               
- wire [31:0] instr, ALUInA, ALUInB, ALUOut, rdA, rdB, signExtend, DMemOut, wRegData, PCIncr;
+ wire [31:0] instr, ALUInA, ALUInB, ALUOut, rdA, rdB, signExtend, DMemOut, wRegData, PCIncr, ALUShamt;
  wire Zero, RegDst, MemRead, MemWrite, MemToReg, ALUSrc, RegWrite, Branch;
  wire [5:0] opcode, func;
  wire [4:0] instr_rs, instr_rt, instr_rd, RegWriteAddr;
@@ -75,6 +75,7 @@ assign instr_rt = IFID_instr[20:16];
 assign instr_rd = IFID_instr[15:11];
 assign imm = IFID_instr[15:0];
 assign signExtend = {{16{imm[15]}}, imm};
+assign ALUShamt = IFID_instr[10:6];
 
 // Register file
 RegFile cpu_regs(clock,
@@ -106,6 +107,7 @@ RegFile cpu_regs(clock,
        IDEX_MemWrite <= 1'b0;
        IDEX_MemToReg <= 1'b0;                  
        IDEX_RegWrite <= 1'b0;
+       IDEX_Shamt <= 1'b0;
     end 
     else 
       begin
@@ -123,6 +125,7 @@ RegFile cpu_regs(clock,
        IDEX_MemWrite <= MemWrite;
        IDEX_MemToReg <= MemToReg;                  
        IDEX_RegWrite <= RegWrite;
+       IDEX_Shamt <= ALUShamt;
     end
   end
 
@@ -158,8 +161,10 @@ assign EX_RegB = (ForwardB == 0) ? IDEX_rdB :
 
 assign ALUInB = (IDEX_ALUSrc == 1'b0) ? EX_RegB : IDEX_signExtend;
 
+
+
 //  ALU
-ALU  #(32) cpu_alu(ALUOut, Zero, ALUInA, ALUInB, ALUOp);
+ALU  #(32) cpu_alu(ALUOut, Zero, ALUInA, ALUInB, ALUOp, IDEX_Shamt);
 
 assign RegWriteAddr = (IDEX_RegDst==1'b0) ? IDEX_instr_rt : IDEX_instr_rd;
 
@@ -212,7 +217,12 @@ assign RegWriteAddr = (IDEX_RegDst==1'b0) ? IDEX_instr_rt : IDEX_instr_rd;
 
 // Data memory 1KB
 // Instantiate the Data Memory here  //dobes
- Memory cpu_DMem(clock, reset, EXMEM_MemRead , EXMEM_MemWrite, EXMEM_ALUOut, EXMEM_MemWriteData, DMemOut);
+ Memory cpu_DMem(clock,
+                 reset,
+                 EXMEM_MemRead,
+                 EXMEM_MemWrite,
+                 EXMEM_ALUOut,EXMEM_MemWriteData,
+                 DMemOut);
 
 
 // MEMWB pipeline register

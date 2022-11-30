@@ -8,11 +8,12 @@
 //             subtraction (op = 6)
 //             slt  (op = 7)
 //             nor (op = 12)
-module ALU #(parameter N = 32) (out, zero, inA, inB, op);
+module ALU #(parameter N = 32) (out, zero, inA, inB, op, shamt);
   output [N-1:0] out;
   output zero;
   input  [N-1:0] inA, inB;
   input  [3:0] op;
+  input [4:0] shamt;
 
   assign out = 
 			(op == 4'b0000) ? inA & inB :
@@ -21,6 +22,8 @@ module ALU #(parameter N = 32) (out, zero, inA, inB, op);
 			(op == 4'b0110) ? inA - inB : 
 			(op == 4'b0111) ? ((inA < inB)?1:0) : 
 			(op == 4'b1100) ? ~(inA | inB) :
+      (op == 4'b1000) ? inB << shamt:
+      (op == 4'b1110) ? inB << inA:
 			'bx;
 
   assign zero = (out == 0);
