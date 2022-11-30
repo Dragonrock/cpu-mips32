@@ -4,7 +4,7 @@
 // It only needs to instantiate CPU, Drive the inputs to CPU (clock, reset)
 // and monitor the outputs. This is what all testbenches do.
 
-
+`include "cpu.v"
 `timescale 1ns/1ps
 `define clock_period  10
 

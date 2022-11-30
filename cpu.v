@@ -2,6 +2,7 @@
 /*********************************  MIPS 5-stage pipeline implementation ***********************/
 /***********************************************************************************************/
 `timescale 1ns/1ps
+`include "control.v"
 
 module cpu(input clock, input reset);
  reg [31:0] PC; 
