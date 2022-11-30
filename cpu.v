@@ -196,7 +196,7 @@ assign RegWriteAddr = (IDEX_RegDst==1'b0) ? IDEX_instr_rt : IDEX_instr_rd;
   control_alu control_alu(ALUOp, IDEX_ALUcntrl, IDEX_signExtend[5:0]);
   
    // TO FILL IN: Instantiation of control logic for Forwarding goes here
-  Forward_Unit forward(EXMEM_instr_rd,
+  Forward_Unit forward(EXMEM_RegWriteAddr,
                        EXMEM_RegWrite,
                        MEMWB_RegWriteAddr,
                        MEMWB_RegWrite,
