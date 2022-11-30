@@ -1,6 +1,7 @@
 /***********************************************************************************************/
 /*********************************  MIPS 5-stage pipeline implementation ***********************/
 /***********************************************************************************************/
+`timescale 1ns/1ps
 
 module cpu(input clock, input reset);
  reg [31:0] PC; 
@@ -29,6 +30,9 @@ module cpu(input clock, input reset);
  wire [1:0] ALUcntrl;
  wire [15:0] imm;
 
+ wire PCWrite, IDEX_Control, IFID_Write;
+ wire [1:0] ForwardA, ForwardB;
+ wire [31:0] EX_RegB;
  
  
 
@@ -39,7 +43,7 @@ module cpu(input clock, input reset);
        PC <= -1;     
     else if (PC == -1)
        PC <= 0;
-    else 
+    else if(PCWrite)
        PC <= PC + 4;
   end
   
@@ -51,7 +55,7 @@ module cpu(input clock, input reset);
        IFID_PCplus4 <= 32'b0;    
        IFID_instr <= 32'b0;
     end 
-    else 
+    else if (IFID_Write)
       begin
        IFID_PCplus4 <= PC + 32'd4;
        IFID_instr <= instr;
@@ -73,12 +77,20 @@ assign imm = IFID_instr[15:0];
 assign signExtend = {{16{imm[15]}}, imm};
 
 // Register file
-RegFile cpu_regs(clock, reset, instr_rs, instr_rt, MEMWB_RegWriteAddr, MEMWB_RegWrite, wRegData, rdA, rdB);
+RegFile cpu_regs(clock,
+                 reset,
+                 instr_rs,
+                 instr_rt,
+                 MEMWB_RegWriteAddr,
+                 MEMWB_RegWrite,
+                 wRegData,
+                 rdA,
+                 rdB);
 
   // IDEX pipeline register
  always @(posedge clock or negedge reset)
   begin 
-    if (reset == 1'b0)
+    if ((reset == 1'b0) || (IDEX_Control == 1'b0))
       begin
        IDEX_rdA <= 32'b0;    
        IDEX_rdB <= 32'b0;
@@ -126,15 +138,25 @@ control_main control_main (RegDst,
                   opcode);
                   
 // TO FILL IN: Instantiation of Control Unit that generates stalls
-
+Hazard_Unit hazards(IDEX_instr_rt,
+                    IDEX_MemRead, 
+                    instr_rs,
+                    instr_rt,
+                    PCWrite,
+                    IDEX_Control,
+                    IFID_Write);
 
 
                            
 /***************** Execution Unit (EX)  ****************/
                  
-assign ALUInA = IDEX_rdA;
-                 
-assign ALUInB = (IDEX_ALUSrc == 1'b0) ? IDEX_rdB : IDEX_signExtend;
+assign ALUInA = (ForwardA == 0) ? IDEX_rdA :
+                ((ForwardA == 1) ? wRegData : EXMEM_ALUOut);
+
+assign EX_RegB = (ForwardB == 0) ? IDEX_rdB :
+                ((ForwardB == 1) ? wRegData : EXMEM_ALUOut);
+
+assign ALUInB = (IDEX_ALUSrc == 1'b0) ? EX_RegB : IDEX_signExtend;
 
 //  ALU
 ALU  #(32) cpu_alu(ALUOut, Zero, ALUInA, ALUInB, ALUOp);
@@ -174,7 +196,14 @@ assign RegWriteAddr = (IDEX_RegDst==1'b0) ? IDEX_instr_rt : IDEX_instr_rd;
   control_alu control_alu(ALUOp, IDEX_ALUcntrl, IDEX_signExtend[5:0]);
   
    // TO FILL IN: Instantiation of control logic for Forwarding goes here
-  
+  Forward_Unit forward(EXMEM_instr_rd,
+                       EXMEM_RegWrite,
+                       MEMWB_instr_rd,
+                       MEMWB_RegWrite,
+                       IDEX_instr_rt,
+                       IDEX_instr_rs,
+                       ForwardA,
+                       ForwardB);
 
   
   
@@ -183,7 +212,7 @@ assign RegWriteAddr = (IDEX_RegDst==1'b0) ? IDEX_instr_rt : IDEX_instr_rd;
 
 // Data memory 1KB
 // Instantiate the Data Memory here  //dobes
- Memory cpu_DataMem(clock, reset, EXMEM_MemRead , EXMEM_MemWrite, EXMEM_ALUOut, EXMEM_MemWriteData, MEMWB_DMemOut);
+ Memory cpu_DMem(clock, reset, EXMEM_MemRead , EXMEM_MemWrite, EXMEM_ALUOut, EXMEM_MemWriteData, DMemOut);
 
 
 // MEMWB pipeline register
@@ -213,6 +242,6 @@ assign RegWriteAddr = (IDEX_RegDst==1'b0) ? IDEX_instr_rt : IDEX_instr_rd;
 
 /***************** WriteBack Unit (WB)  ****************/  
 // TO FILL IN: Write Back logic 
-
+assign wRegData = (MEMWB_MemToReg) ? MEMWB_DMemOut : MEMWB_ALUOut;
 
 endmodule

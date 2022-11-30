@@ -1,5 +1,6 @@
 
 `include "constants.h"
+`timescale 1ns/1ps
 
 /************** Main control in ID pipe stage  *************/
 module control_main(output reg RegDst,
@@ -9,7 +10,6 @@ module control_main(output reg RegDst,
                 output reg MemToReg,  
                 output reg ALUSrc,  
                 output reg RegWrite,
-                output reg BranchCond,  
                 output reg [1:0] ALUcntrl,  
                 input [5:0] opcode);
 
@@ -21,7 +21,6 @@ module control_main(output reg RegDst,
         RegDst = 1'b1;
         ALUSrc = 1'b0;
         Branch = 1'b0;
-        BranchCond= 1'b0;
         MemWrite = 1'b0;
         MemRead = 1'b0;
         MemToReg = 1'b0;
@@ -33,7 +32,6 @@ module control_main(output reg RegDst,
         RegDst = 1'b0;
         ALUSrc = 1'b1;
         Branch = 1'b0;
-        BranchCond= 1'b0;
         MemWrite = 1'b0;
         MemRead = 1'b1;
         MemToReg = 1'b1;
@@ -45,7 +43,6 @@ module control_main(output reg RegDst,
         RegDst = 1'bx;
         ALUSrc = 1'b1;
         Branch = 1'b0;
-        BranchCond= 1'b0;
         MemWrite = 1'b1;
         MemRead = 1'b0;
         MemToReg = 1'bx;
@@ -57,7 +54,6 @@ module control_main(output reg RegDst,
         RegDst = 1'bx;
         ALUSrc = 1'b0;
         Branch = 1'b1;
-        BranchCond= 1'b0;
         MemWrite = 1'b0;
         MemRead = 1'b0;
         MemToReg = 1'bx;
@@ -69,7 +65,6 @@ module control_main(output reg RegDst,
         RegDst = 1'bx;
         ALUSrc = 1'b0;
         Branch = 1'b1;
-        BranchCond= 1'b1;
         MemWrite = 1'b0;
         MemRead = 1'b0;
         MemToReg = 1'bx;
@@ -80,7 +75,6 @@ module control_main(output reg RegDst,
         RegDst = 1'b0;
         ALUSrc = 1'b1;
         Branch = 1'b0;
-        BranchCond= 1'b0;
         MemWrite = 1'b0;
         MemRead = 1'b0;
         MemToReg = 1'b0;
@@ -92,7 +86,6 @@ module control_main(output reg RegDst,
         RegDst = 1'bx;
         ALUSrc = 1'bx;
         Branch = 1'bx;
-        BranchCond= 1'bx;
         MemWrite = 1'bx;
         MemRead = 1'b0;
         MemToReg = 1'bx;
@@ -105,30 +98,40 @@ endmodule
 
 /**************** Module for Bypass Detection in EX pipe stage goes here  *********/
 // TO FILL IN: Module details 
-module Forward_Unit (input EX_MEM_RegisterRd,
-                input EX_MEM_RegWrite,
-                input MEM_WB_RegisterRd,
-                input MEM_WB_RegWrite,
-                input ID_EX_RegisterRt,
-                input ID_EX_RegisterRs,
-                output reg [1:0] ForwardA,
-                output reg [1:0] ForwardB);
+module Forward_Unit (input [4:0] EX_MEM_RegisterRd,
+                     input EX_MEM_RegWrite,
+                     input [4:0] MEM_WB_RegisterRd,
+                     input MEM_WB_RegWrite,
+                     input [4:0] ID_EX_RegisterRt,
+                     input [4:0] ID_EX_RegisterRs,
+                     output reg [1:0] ForwardA,
+                     output reg [1:0] ForwardB);
 
   always @(*)
     begin
-      if (EX_MEM_RegWrite == 1 && EX_MEM_RegisterRd != 0 && EX_MEM_RegisterRd == ID_EX_RegisterRs)
-        ForwardA <= 2'b10;
-      else if (MEM_WB_RegWrite == 1 && MEM_WB_RegisterRd != 0 && MEM_WB_RegisterRd == ID_EX_RegisterRs && (EX_MEM_RegisterRd != ID_EX_RegisterRs || EX_MEM_RegWrite == 0))
-        ForwardA <= 1'b1;
-      else
-        ForwardA <= 1'b0;
 
-      if (EX_MEM_RegWrite == 1 && EX_MEM_RegisterRd != 0 && EX_MEM_RegisterRd == ID_EX_RegisterRt)
+      //Initializing forwarding signals to zero
+      {ForwardA, ForwardB} <= 0;
+
+      if ((EX_MEM_RegWrite && EX_MEM_RegisterRd) &&         ///to try : reverse the if and else if and remove from current else if half the &&
+          (EX_MEM_RegisterRd == ID_EX_RegisterRs))
+        ForwardA <= 2'b10;
+      else if ((MEM_WB_RegWrite && MEM_WB_RegisterRd) && 
+              ((MEM_WB_RegisterRd == ID_EX_RegisterRs) &&
+              ((EX_MEM_RegisterRd != ID_EX_RegisterRs) || 
+              (!EX_MEM_RegWrite))))
+        ForwardA <= 1'b1;
+
+
+      if ((EX_MEM_RegWrite && EX_MEM_RegisterRd) && 
+          (EX_MEM_RegisterRd == ID_EX_RegisterRt))
         ForwardB <= 2'b10;
-      else if (MEM_WB_RegWrite == 1 && MEM_WB_RegisterRd != 0 && MEM_WB_RegisterRd == ID_EX_RegisterRt && (EX_MEM_RegisterRd != ID_EX_RegisterRt || EX_MEM_RegWrite == 0))
+      else if ((MEM_WB_RegWrite && MEM_WB_RegisterRd) && 
+              ((MEM_WB_RegisterRd == ID_EX_RegisterRt) && 
+              ((EX_MEM_RegisterRd != ID_EX_RegisterRt) || 
+              (EX_MEM_RegWrite == 0))))
         ForwardB <= 1'b1;
-      else
-        ForwardB <= 1'b0;
+
     end
 
 endmodule
@@ -136,26 +139,28 @@ endmodule
 
 /**************** Module for Stall Detection in ID pipe stage goes here  *********/
 // TO FILL IN: Module details 
-module Hazard_Unit(input ID_EX_RegisterRt,
+module Hazard_Unit(input [4:0] ID_EX_RegisterRt,
                    input ID_EX_MemRead,
-                   input IF_ID_RegisterRs,
-                   input IF_ID_RegisterRt,
+                   input [4:0] IF_ID_RegisterRs,
+                   input [4:0] IF_ID_RegisterRt,
                    output reg PCWrite,
-                   output reg selector,     //selector bit for multiplexer
-                   output reg IF_IDWrite);
+                   output reg IDEX_Control, //selector bit for multiplexer
+                   output reg IFID_Write);
   always @(*) 
     begin
-      if (ID_EX_MemRead == 1 && (ID_EX_RegisterRt == IF_ID_RegisterRs || ID_EX_RegisterRt == IF_ID_RegisterRt))
+      if ((ID_EX_MemRead) && 
+          ((ID_EX_RegisterRt == IF_ID_RegisterRs) || 
+          (ID_EX_RegisterRt == IF_ID_RegisterRt)))
         begin
           PCWrite <= 1'b0;   //Write Enable for PC = 0
-          IF_IDWrite <= 1'b0;  //Write Enable for IF/ID = 0
-          selector <= 1'b0;
+          IFID_Write <= 1'b0;  //Write Enable for IF/ID = 0
+          IDEX_Control <= 1'b0;
         end
       else
         begin
           PCWrite <= 1'b1;
-          IF_IDWrite <= 1'b1;
-          selector <= 1'b1;
+          IFID_Write <= 1'b1;
+          IDEX_Control <= 1'b1;
         end
     end
 
