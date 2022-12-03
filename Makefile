@@ -1,6 +1,6 @@
 CC = iverilog
 FLAGS = -Wall -Winfloop
-EXE = lab6a.out
+EXE = lab7a.out
 SRCS = control.v library.v cpu.v testbench.v
 
 all:
