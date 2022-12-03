@@ -1,36 +1,52 @@
 **** module/scope: Forward_Unit
      Flip-Flops   : 0
-     Logic Gates  : 104
-     EQUALITY[5]: 8 units
+     Logic Gates  : 176
+     EQUALITY[5]: 14 units
      MUX[2]: 8 slices
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted
 **** TOTALS
      Flip-Flops   : 0
-     Logic Gates  : 104
-     EQUALITY[5]: 8 units
+     Logic Gates  : 176
+     EQUALITY[5]: 14 units
      MUX[2]: 8 slices
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted
 **** module/scope: Hazard_Unit
      Flip-Flops   : 0
      Logic Gates  : 28
      EQUALITY[5]: 2 units
      MUX[2]: 3 slices
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted
 **** TOTALS
      Flip-Flops   : 0
      Logic Gates  : 28
      EQUALITY[5]: 2 units
      MUX[2]: 3 slices
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted
 **** module/scope: control_alu
      Flip-Flops   : 0
      Logic Gates  : 0
      LPM[5]: 2 unaccounted
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted
 **** TOTALS
      Flip-Flops   : 0
      Logic Gates  : 0
      LPM[5]: 2 unaccounted
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted
 **** module/scope: control_main
      Flip-Flops   : 0
      Logic Gates  : 0
      LPM[5]: 8 unaccounted
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted
 **** TOTALS
      Flip-Flops   : 0
      Logic Gates  : 0
      LPM[5]: 8 unaccounted
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted

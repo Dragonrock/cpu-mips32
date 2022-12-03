@@ -116,19 +116,25 @@ module Forward_Unit (input [4:0] EX_MEM_RegisterRd,
 
       
       if ((MEM_WB_RegWrite && MEM_WB_RegisterRd) && 
-          (MEM_WB_RegisterRd == ID_EX_RegisterRs))
+          (MEM_WB_RegisterRd == ID_EX_RegisterRs) &&
+          (MEM_WB_RegisterRd) &&
+          ((EX_MEM_RegisterRd != ID_EX_RegisterRs) || (!EX_MEM_RegWrite)))
         ForwardA <= 'd1;
         
       else if ((EX_MEM_RegWrite && EX_MEM_RegisterRd) && 
-              (EX_MEM_RegisterRd == ID_EX_RegisterRs))
+              (EX_MEM_RegisterRd == ID_EX_RegisterRs) &&
+              (EX_MEM_RegisterRd))
         ForwardA <= 'd2;
 
       if ((MEM_WB_RegWrite && MEM_WB_RegisterRd) && 
-          (MEM_WB_RegisterRd == ID_EX_RegisterRt))
+          (MEM_WB_RegisterRd == ID_EX_RegisterRt) &&
+          (MEM_WB_RegisterRd) &&
+          ((EX_MEM_RegisterRd != ID_EX_RegisterRt) || (!EX_MEM_RegWrite)))
         ForwardB <= 'd1;
       
       else if ((EX_MEM_RegWrite && EX_MEM_RegisterRd) && 
-               (EX_MEM_RegisterRd == ID_EX_RegisterRt))
+               (EX_MEM_RegisterRd == ID_EX_RegisterRt) &&
+               (EX_MEM_RegisterRd))
         ForwardB <= 'd2;
 
     end
