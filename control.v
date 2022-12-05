@@ -11,6 +11,7 @@ module control_main(output reg RegDst,
                 output reg MemToReg,  
                 output reg ALUSrc,  
                 output reg RegWrite,
+                output reg BranchCond,
                 output reg [1:0] ALUcntrl,  
                 input [5:0] opcode);
 
@@ -26,6 +27,7 @@ module control_main(output reg RegDst,
         MemRead = 1'b0;
         MemToReg = 1'b0;
         ALUcntrl = 2'b10;
+        BranchCond = 1'b0;
       end
 
       `LW: begin
@@ -37,6 +39,8 @@ module control_main(output reg RegDst,
         MemRead = 1'b1;
         MemToReg = 1'b1;
         ALUcntrl = 2'b00;
+        BranchCond = 1'b0;
+
       end
 
       `SW: begin
@@ -48,6 +52,8 @@ module control_main(output reg RegDst,
         MemRead = 1'b0;
         MemToReg = 1'bx;
         ALUcntrl = 2'b00;
+        BranchCond = 1'b0;
+
       end
       
       `BEQ: begin
@@ -59,6 +65,8 @@ module control_main(output reg RegDst,
         MemRead = 1'b0;
         MemToReg = 1'bx;
         ALUcntrl = 2'b01;
+        BranchCond = 1'b0;
+
       end
 
       `BNE: begin
@@ -70,6 +78,7 @@ module control_main(output reg RegDst,
         MemRead = 1'b0;
         MemToReg = 1'bx;
         ALUcntrl = 2'b01;
+        BranchCond = 1'b1;
       end
       `ADDI: begin
         RegWrite = 1'b1;
@@ -80,6 +89,7 @@ module control_main(output reg RegDst,
         MemRead = 1'b0;
         MemToReg = 1'b0;
         ALUcntrl = 2'b00;
+        BranchCond = 1'b0;
       end
       
       default: begin
@@ -149,7 +159,7 @@ module Hazard_Unit(input [4:0] ID_EX_RegisterRt,
                    input [4:0] IF_ID_RegisterRs,
                    input [4:0] IF_ID_RegisterRt,
                    output reg PCWrite,
-                   output reg IDEX_Control, //selector bit for multiplexer
+                   output reg bubble_idex, //selector bit for multiplexer
                    output reg IFID_Write);
   always @(*) 
     begin
@@ -159,13 +169,13 @@ module Hazard_Unit(input [4:0] ID_EX_RegisterRt,
         begin
           PCWrite <= 1'b0;   //Write Enable for PC = 0
           IFID_Write <= 1'b0;  //Write Enable for IF/ID = 0
-          IDEX_Control <= 1'b0;
+          bubble_idex <= 1'b1;
         end
       else
         begin
           PCWrite <= 1'b1;
           IFID_Write <= 1'b1;
-          IDEX_Control <= 1'b1;
+          bubble_idex <= 1'b0;
         end
     end
 

@@ -41,12 +41,14 @@
 **** module/scope: control_main
      Flip-Flops   : 0
      Logic Gates  : 0
-     LPM[5]: 8 unaccounted
-     LOG[13]: 1 unaccounted
+     LPM[5]: 10 unaccounted
+     LPM[40]: 1 unaccounted
+     LOG[13]: 2 unaccounted
      LOG[14]: 1 unaccounted
 **** TOTALS
      Flip-Flops   : 0
      Logic Gates  : 0
-     LPM[5]: 8 unaccounted
-     LOG[13]: 1 unaccounted
+     LPM[5]: 10 unaccounted
+     LPM[40]: 1 unaccounted
+     LOG[13]: 2 unaccounted
      LOG[14]: 1 unaccounted
