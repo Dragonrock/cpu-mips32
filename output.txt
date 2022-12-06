@@ -31,6 +31,6 @@ lw $v0, 8($t2)     : PASS
 FLUSH BEQ
 beq $v0, $s0, L2   : PASS
 add $t5, $t5, $t5 : PASS
-xor $t0, $t0, $t1 : FAIL
+xor $t0, $t0, $t1 : PASS
 addi $t4, $t3, 2 : PASS
 or  $t6, $t5, $t4 : PASS
