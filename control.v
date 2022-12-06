@@ -234,6 +234,7 @@ module control_alu(output reg [3:0] ALUOp,
               6'b101010: ALUOp = 4'b0111; // slt
               6'b000000: ALUOp = 4'b1000; // sll
               6'b000100: ALUOp = 4'b1110; // sllv
+              6'b100110: ALUOp = 4'b1111; // xor
               default: ALUOp = 4'b0000;
              endcase 
           end   
