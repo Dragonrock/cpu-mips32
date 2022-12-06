@@ -189,7 +189,7 @@ assign RegWriteAddr = (IDEX_RegDst==1'b0) ? IDEX_instr_rt : IDEX_instr_rd;
  // EXMEM pipeline register
  always @(posedge clock or negedge reset)
   begin 
-    if ((reset == 1'b0) || (PCSrc))
+    if ((reset == 1'b0) || (bubble_idex && PCSrc))
       begin
        EXMEM_ALUOut <= 32'b0;    
        EXMEM_RegWriteAddr <= 5'b0;
