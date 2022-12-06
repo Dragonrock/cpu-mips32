@@ -12,12 +12,27 @@ module control_main(output reg RegDst,
                 output reg ALUSrc,  
                 output reg RegWrite,
                 output reg BranchCond,
-                output reg [1:0] ALUcntrl,  
+                output reg [1:0] ALUcntrl,
+                output reg Jump,
                 input [5:0] opcode);
 
   always @(*) 
    begin
      case (opcode)
+
+      `J: begin
+        RegWrite = 1'b0;
+        RegDst = 1'b0;
+        ALUSrc = 1'b0;
+        Branch = 1'b0;
+        MemWrite = 1'b0;
+        MemRead = 1'b0;
+        MemToReg = 1'b0;
+        ALUcntrl = 2'b00;
+        BranchCond = 1'b0;
+        Jump = 1'b1;
+      end
+
       `R_FORMAT: begin
         RegWrite = 1'b1;
         RegDst = 1'b1;
@@ -28,6 +43,7 @@ module control_main(output reg RegDst,
         MemToReg = 1'b0;
         ALUcntrl = 2'b10;
         BranchCond = 1'b0;
+        Jump = 1'b0;
       end
 
       `LW: begin
@@ -40,6 +56,7 @@ module control_main(output reg RegDst,
         MemToReg = 1'b1;
         ALUcntrl = 2'b00;
         BranchCond = 1'b0;
+        Jump = 1'b0;
 
       end
 
@@ -53,7 +70,7 @@ module control_main(output reg RegDst,
         MemToReg = 1'bx;
         ALUcntrl = 2'b00;
         BranchCond = 1'b0;
-
+        Jump = 1'b0;
       end
       
       `BEQ: begin
@@ -66,6 +83,7 @@ module control_main(output reg RegDst,
         MemToReg = 1'bx;
         ALUcntrl = 2'b01;
         BranchCond = 1'b0;
+        Jump = 1'b0;
 
       end
 
@@ -79,7 +97,10 @@ module control_main(output reg RegDst,
         MemToReg = 1'bx;
         ALUcntrl = 2'b01;
         BranchCond = 1'b1;
+        Jump = 1'b0;
+
       end
+
       `ADDI: begin
         RegWrite = 1'b1;
         RegDst = 1'b0;
@@ -90,6 +111,7 @@ module control_main(output reg RegDst,
         MemToReg = 1'b0;
         ALUcntrl = 2'b00;
         BranchCond = 1'b0;
+        Jump = 1'b0;
       end
       
       default: begin
@@ -98,10 +120,13 @@ module control_main(output reg RegDst,
         ALUSrc = 1'bx;
         Branch = 1'bx;
         MemWrite = 1'bx;
-        MemRead = 1'b0;
+        MemRead = 1'bx;
         MemToReg = 1'bx;
         ALUcntrl = 2'bxx;
+        BranchCond = 1'bx;
+        Jump = 1'bx;
       end
+      
     endcase
     end // always
 endmodule
@@ -154,7 +179,8 @@ endmodule
 
 /**************** Module for Stall Detection in ID pipe stage goes here  *********/
 // TO FILL IN: Module details 
-module Hazard_Unit(input [4:0] ID_EX_RegisterRt,
+module Hazard_Unit(input Branched,
+                   input [4:0] ID_EX_RegisterRt,
                    input ID_EX_MemRead,
                    input [4:0] IF_ID_RegisterRs,
                    input [4:0] IF_ID_RegisterRt,
@@ -163,7 +189,15 @@ module Hazard_Unit(input [4:0] ID_EX_RegisterRt,
                    output reg IFID_Write);
   always @(*) 
     begin
-      if ((ID_EX_MemRead) && 
+      if(Branched) begin
+          PCWrite <= 1'b1;   //Write Enable for PC = 0
+          IFID_Write <= 1'b0;  //Write Enable for IF/ID = 0
+          bubble_idex <= 1'b1;
+      end
+
+      
+
+      else if ((ID_EX_MemRead) && 
           ((ID_EX_RegisterRt == IF_ID_RegisterRs) || 
           (ID_EX_RegisterRt == IF_ID_RegisterRt)))
         begin

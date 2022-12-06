@@ -1,27 +1,27 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Thu Dec  1 23:39:04 2022
+[*] Tue Dec  6 02:27:26 2022
 [*]
 [dumpfile] "/home/dragon/Desktop/Coding/Sem 3/cpu-mips32/tb_dumpfile.vcd"
-[dumpfile_mtime] "Thu Dec  1 23:26:17 2022"
-[dumpfile_size] 58900
+[dumpfile_mtime] "Tue Dec  6 02:24:44 2022"
+[dumpfile_size] 93750
 [savefile] "/home/dragon/Desktop/Coding/Sem 3/cpu-mips32/format_kimatomorfon.gtkw"
 [timestart] 0
-[size] 1880 1047
-[pos] -172 -123
-*-18.321026 284000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1878 1046
+[pos] 1879 0
+*-18.321026 754000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] cpu_tb.
 [treeopen] cpu_tb.pipe0.
 [sst_width] 212
 [signals_width] 708
 [sst_expanded] 1
-[sst_vpaned_height] 312
+[sst_vpaned_height] 313
 @200
 -Runner
 @28
 cpu_tb.cpu0.clock
 cpu_tb.cpu0.reset
-@22
+@24
 cpu_tb.cpu0.PC[31:0]
 @200
 -
@@ -54,6 +54,11 @@ cpu_tb.cpu0.IFID_PCplus4[31:0]
 cpu_tb.cpu0.IFID_Write
 @22
 cpu_tb.cpu0.IFID_instr[31:0]
+cpu_tb.cpu0.targetPc[31:0]
+@28
+cpu_tb.cpu0.Jump
+cpu_tb.cpu0.PCSrc
+cpu_tb.cpu0.bubble_idex
 @200
 -
 -IDEX
@@ -61,7 +66,6 @@ cpu_tb.cpu0.IFID_instr[31:0]
 cpu_tb.cpu0.IDEX_ALUSrc
 cpu_tb.cpu0.IDEX_ALUcntrl[1:0]
 cpu_tb.cpu0.IDEX_Branch
-cpu_tb.cpu0.IDEX_Control
 cpu_tb.cpu0.IDEX_MemRead
 cpu_tb.cpu0.IDEX_MemToReg
 cpu_tb.cpu0.IDEX_MemWrite
@@ -95,6 +99,8 @@ cpu_tb.cpu0.EXMEM_RegWriteAddr[4:0]
 cpu_tb.cpu0.EXMEM_Zero
 @22
 cpu_tb.cpu0.EX_RegB[31:0]
+@25
+cpu_tb.cpu0.EXMEM_PCBranch[31:0]
 @200
 -
 -MEMWB
@@ -132,9 +138,8 @@ cpu_tb.cpu0.cpu_DMem.clock
 cpu_tb.cpu0.cpu_DMem.ren
 cpu_tb.cpu0.cpu_DMem.reset
 cpu_tb.cpu0.cpu_DMem.wen
-@201
--
 @200
+-
 -Instruction_Memory
 @24
 cpu_tb.cpu0.cpu_IMem.\data[0][31:0]
@@ -240,7 +245,6 @@ cpu_tb.cpu0.forward.MEM_WB_RegisterRd[4:0]
 -
 -Hazard_Unit
 @24
-cpu_tb.cpu0.hazards.IDEX_Control
 cpu_tb.cpu0.hazards.ID_EX_MemRead
 cpu_tb.cpu0.hazards.ID_EX_RegisterRt[4:0]
 cpu_tb.cpu0.hazards.IFID_Write
