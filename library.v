@@ -16,15 +16,20 @@ module ALU #(parameter N = 32) (out, zero, inA, inB, op, shamt);
   input [4:0] shamt;
 
   assign out = 
-			(op == 4'b0000) ? inA & inB :
-			(op == 4'b0001) ? inA | inB :
-			(op == 4'b0010) ? inA + inB : 
-			(op == 4'b0110) ? inA - inB : 
-			(op == 4'b0111) ? ((inA < inB)?1:0) : 
-			(op == 4'b1100) ? ~(inA | inB) :
-      (op == 4'b1000) ? inB << shamt:
-      (op == 4'b1110) ? inB << inA:
-	  	(op == 4'b1111) ? ((inA & (~inB)) | ((~inA) & inB)):
+			(op == 4'b0000) ? inA & inB : //and
+			(op == 4'b0001) ? inA | inB : //or
+			(op == 4'b0010) ? inA + inB : //add
+			(op == 4'b0110) ? inA - inB :  //sub
+			(op == 4'b0111) ? ((inA < inB)?1:0) : //slt 
+			(op == 4'b1100) ? ~(inA | inB) : //nor
+      (op == 4'b1000) ? inB << shamt: //sll
+      (op == 4'b1110) ? inB << inA: //sllv
+      
+      //xor if not supported use ((inA & (~inB)) | ((~inA) & inB))
+	  	(op == 4'b1111) ? inA ^ inB : 
+      
+      (op == 4'b1010) ? inB >> shamt: //srl
+      (op == 4'b1001) ? inB >> inA: //srlv
 			'bx;
 
   assign zero = (out == 0);

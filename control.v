@@ -226,15 +226,17 @@ module control_alu(output reg [3:0] ALUOp,
         2'b10: 
            begin
              case (func)
-              6'b100000: ALUOp = 4'b0010; // add
-              6'b100010: ALUOp = 4'b0110; // sub
-              6'b100100: ALUOp = 4'b0000; // and
-              6'b100101: ALUOp = 4'b0001; // or
-              6'b100111: ALUOp = 4'b1100; // nor
-              6'b101010: ALUOp = 4'b0111; // slt
-              6'b000000: ALUOp = 4'b1000; // sll
-              6'b000100: ALUOp = 4'b1110; // sllv
-              6'b100110: ALUOp = 4'b1111; // xor
+              `ADD: ALUOp = 4'b0010; // add
+              `SUB: ALUOp = 4'b0110; // sub
+              `AND: ALUOp = 4'b0000; // and
+              `OR: ALUOp = 4'b0001; // or
+              `NOR: ALUOp = 4'b1100; // nor
+              `SLT: ALUOp = 4'b0111; // slt
+              `SLL: ALUOp = 4'b1000; // sll
+              `SLLV: ALUOp = 4'b1110; // sllv
+              `XOR: ALUOp = 4'b1111; // xor
+              `SRL: ALUOp = 4'b1010; // srl
+              `SRLV: ALUOp = 4'b1001; // srlv
               default: ALUOp = 4'b0000;
              endcase 
           end   

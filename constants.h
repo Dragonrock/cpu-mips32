@@ -19,17 +19,17 @@
 // Opcodes 
 // R-format, FUNC
 `define R_FORMAT  6'b0
-`define SLL 6'b000000
+`define SLL 6'b000000 //
 `define SRL 6'b000010
-`define SLLV 6'b000100
+`define SLLV 6'b000100 //
 `define SRLV 6'b000110
-`define ADD 6'b100000            
-`define SUB 6'b100010
-`define AND 6'b100100
-`define OR  6'b100101
-`define NOR 6'b100111
-`define XOR 6'b100110
-`define SLT 6'b101010
+`define ADD 6'b100000 //        
+`define SUB 6'b100010 //
+`define AND 6'b100100 //
+`define OR  6'b100101 //
+`define NOR 6'b100111 //
+`define XOR 6'b100110 //
+`define SLT 6'b101010 //
 
 // I-format, OPCODE
 `define ADDI 6'b001000
