@@ -62,12 +62,12 @@ module control_main(output reg RegDst,
 
       `SW: begin
         RegWrite = 1'b0;
-        RegDst = 1'bx;
+        RegDst = 1'b0;
         ALUSrc = 1'b1;
         Branch = 1'b0;
         MemWrite = 1'b1;
         MemRead = 1'b0;
-        MemToReg = 1'bx;
+        MemToReg = 1'b0;
         ALUcntrl = 2'b00;
         BranchCond = 1'b0;
         Jump = 1'b0;
@@ -75,12 +75,12 @@ module control_main(output reg RegDst,
       
       `BEQ: begin
         RegWrite = 1'b0;
-        RegDst = 1'bx;
+        RegDst = 1'b0;
         ALUSrc = 1'b0;
         Branch = 1'b1;
         MemWrite = 1'b0;
         MemRead = 1'b0;
-        MemToReg = 1'bx;
+        MemToReg = 1'b0;
         ALUcntrl = 2'b01;
         BranchCond = 1'b0;
         Jump = 1'b0;
@@ -89,12 +89,12 @@ module control_main(output reg RegDst,
 
       `BNE: begin
         RegWrite = 1'b0;
-        RegDst = 1'bx;
+        RegDst = 1'b0;
         ALUSrc = 1'b0;
         Branch = 1'b1;
         MemWrite = 1'b0;
         MemRead = 1'b0;
-        MemToReg = 1'bx;
+        MemToReg = 1'b0;
         ALUcntrl = 2'b01;
         BranchCond = 1'b1;
         Jump = 1'b0;

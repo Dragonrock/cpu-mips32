@@ -7,7 +7,7 @@ module cpu(input clock, input reset);
  reg [31:0] PC; 
  reg [31:0] IFID_PCplus4;
  reg [31:0] IFID_instr;
- reg [31:0] IDEX_rdA, IDEX_rdB, IDEX_signExtend, IDEX_PCplus4;
+ reg [31:0]  IDEX_signExtend, IDEX_PCplus4;
  reg [4:0]  IDEX_instr_rt, IDEX_instr_rs, IDEX_instr_rd, IDEX_Shamt;                            
  reg        IDEX_RegDst, IDEX_ALUSrc;
  reg [1:0]  IDEX_ALUcntrl;
@@ -21,8 +21,10 @@ module cpu(input clock, input reset);
  reg [31:0] MEMWB_DMemOut;
  reg [4:0]  MEMWB_RegWriteAddr, MEMWB_instr_rd; 
  reg [31:0] MEMWB_ALUOut;
- reg        MEMWB_MemToReg, MEMWB_RegWrite;               
- wire [31:0] instr, ALUInA, ALUInB, ALUOut, rdA, rdB, signExtend, DMemOut, wRegData, PCIncr, ALUShamt;
+ reg        MEMWB_MemToReg, MEMWB_RegWrite;      
+
+ wire [31:0] IDEX_rdA, IDEX_rdB;         
+ wire [31:0] instr, ALUInA, ALUInB, ALUOut, signExtend, DMemOut, wRegData, PCIncr, ALUShamt;
  wire Zero, RegDst, MemRead, MemWrite, MemToReg, ALUSrc, RegWrite, Branch;
  wire [5:0] opcode, func;
  wire [4:0] instr_rs, instr_rt, instr_rd, RegWriteAddr;
@@ -95,16 +97,14 @@ RegFile cpu_regs(clock,
                  MEMWB_RegWriteAddr,
                  MEMWB_RegWrite,
                  wRegData,
-                 rdA,
-                 rdB);
+                 IDEX_rdA,
+                 IDEX_rdB);
 
   // IDEX pipeline register
  always @(posedge clock or negedge reset)
   begin 
     if ((reset == 1'b0) || (bubble_idex))
       begin
-       IDEX_rdA <= 32'b0;    
-       IDEX_rdB <= 32'b0;
        IDEX_signExtend <= 32'b0;
        IDEX_instr_rd <= 5'b0;
        IDEX_instr_rs <= 5'b0;
@@ -122,8 +122,6 @@ RegFile cpu_regs(clock,
     end 
     else 
       begin
-       IDEX_rdA <= rdA;
-       IDEX_rdB <= rdB;
        IDEX_signExtend <= signExtend;
        IDEX_instr_rd <= instr_rd;
        IDEX_instr_rs <= instr_rs;
@@ -169,11 +167,11 @@ Hazard_Unit hazards(PCSrc,
                            
 /***************** Execution Unit (EX)  ****************/
                  
-assign ALUInA = (ForwardA == 0) ? IDEX_rdA :
-                ((ForwardA == 1) ? wRegData : EXMEM_ALUOut);
+assign ALUInA =   (ForwardA == 0) ? IDEX_rdA :
+                  (ForwardA == 1) ? wRegData : EXMEM_ALUOut;
 
-assign EX_RegB = (ForwardB == 0) ? IDEX_rdB :
-                ((ForwardB == 1) ? wRegData : EXMEM_ALUOut);
+assign EX_RegB =  (ForwardB == 0) ? IDEX_rdB :
+                  (ForwardB == 1) ? wRegData : EXMEM_ALUOut;
 
 assign ALUInB = (IDEX_ALUSrc == 1'b0) ? EX_RegB : IDEX_signExtend;
 

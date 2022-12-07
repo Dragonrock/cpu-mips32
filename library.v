@@ -72,22 +72,32 @@ module RegFile (clock, reset, raA, raB, wa, wen, wd, rdA, rdB);
   input   [4:0] raA, raB, wa;
   input         wen;
   input  [31:0] wd;
-  output [31:0] rdA, rdB;
+  output reg [31:0] rdA, rdB;
   integer i;
   
   reg [31:0] data[31:0];
   
-  wire [31:0] rdA = data[raA];
-  wire [31:0] rdB = data[raB];
   
   // Make sure  that register file is only written at the negative edge of the clock 
-  always @(negedge clock or negedge reset)
+  always @(posedge clock or negedge reset)
    begin
+
+    if(wa == raA) 
+      rdA <= wd;
+    else
+      rdA <= data[raA];
+    
+    if(wa == raB)
+      rdB <= wd;
+    else
+      rdB <= data[raB];
+
     if (reset == 1'b0)
         for (i = 0; i < 32; i = i+1)
          data[i] = i;   // Note that R0 = 0 in MIPS 
+   
     else if( wen == 1'b1 && wa != 5'b0)
-        data[wa] <=  wd;
+        data[wa] =  wd;
    end
 
 endmodule
