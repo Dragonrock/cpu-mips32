@@ -45,7 +45,7 @@ module cpu(input clock, input reset);
        PC <= -1;     
     else if (PC == -1)
        PC <= 0;
-    else if(PCWrite )begin
+    else if(PCWrite)begin
       if((Jump &&(IDEX_Branch || IDEX_BranchCond)));
         // case for branch and then jump...stall jump to check for branch
       else if(PCSrc)
