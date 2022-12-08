@@ -195,8 +195,6 @@ module Hazard_Unit(input Branched,
           bubble_idex <= 1'b1;
       end
 
-      
-
       else if ((ID_EX_MemRead) && 
           ((ID_EX_RegisterRt == IF_ID_RegisterRs) || 
           (ID_EX_RegisterRt == IF_ID_RegisterRt)))

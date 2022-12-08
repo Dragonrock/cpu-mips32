@@ -99,10 +99,10 @@ module RegFile (clock, reset, raA, raB, wa, wen, wd, rdA, rdB);
 
     if (reset == 1'b0)
         for (i = 0; i < 32; i = i+1)
-         data[i] = i;   // Note that R0 = 0 in MIPS 
+         data[i] <= i;   // Note that R0 = 0 in MIPS 
    
     else if( wen == 1'b1 && wa != 5'b0)
-        data[wa] =  wd;
+        data[wa] <=  wd;
    end
 
 endmodule
