@@ -87,12 +87,12 @@ module RegFile (clock, reset, raA, raB, wa, wen, wd, rdA, rdB);
   always @(posedge clock or negedge reset)
    begin
 
-    if(wa == raA) 
+    if(wa == raA && (wen)) 
       rdA <= wd;
     else
       rdA <= data[raA];
     
-    if(wa == raB)
+    if(wa == raB && (wen))
       rdB <= wd;
     else
       rdB <= data[raB];

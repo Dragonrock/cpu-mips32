@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Wed Dec  7 17:33:49 2022
+[*] Thu Dec  8 12:04:03 2022
 [*]
 [dumpfile] "/home/dragon/Desktop/Coding/Sem 3/cpu-mips32/tb_dumpfile.vcd"
-[dumpfile_mtime] "Wed Dec  7 17:24:27 2022"
-[dumpfile_size] 109652
+[dumpfile_mtime] "Thu Dec  8 12:03:09 2022"
+[dumpfile_size] 41832
 [savefile] "/home/dragon/Desktop/Coding/Sem 3/cpu-mips32/format_kimatomorfon.gtkw"
-[timestart] 616300
+[timestart] 0
 [size] 1878 1046
 [pos] 1879 0
-*-15.321026 746200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-18.321026 150000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] cpu_tb.
 [treeopen] cpu_tb.cpu0.
 [treeopen] cpu_tb.pipe0.
@@ -26,6 +26,13 @@ cpu_tb.cpu0.reset
 cpu_tb.cpu0.PC[31:0]
 @200
 -
+@28
+cpu_tb.cpu0.IDEX_Branch
+cpu_tb.cpu0.IDEX_BranchCond
+cpu_tb.cpu0.Jump
+@29
+cpu_tb.cpu0.PCSrc
+@200
 -Control Signals
 @24
 cpu_tb.cpu0.control_main.ALUSrc
@@ -56,9 +63,8 @@ cpu_tb.cpu0.cpu_alu.out[31:0]
 cpu_tb.cpu0.cpu_alu.shamt[4:0]
 @28
 cpu_tb.cpu0.cpu_alu.zero
-@201
--
 @200
+-
 -IFID
 @22
 cpu_tb.cpu0.IFID_PCplus4[31:0]

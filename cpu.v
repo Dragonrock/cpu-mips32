@@ -45,11 +45,13 @@ module cpu(input clock, input reset);
        PC <= -1;     
     else if (PC == -1)
        PC <= 0;
-    else if(PCWrite)begin
-      if(Jump)
-        PC <= targetPc << 2;
+    else if(PCWrite )begin
+      if((Jump &&(IDEX_Branch || IDEX_BranchCond)));
+        // case for branch and then jump...stall jump to check for branch
       else if(PCSrc)
         PC <= EXMEM_PCBranch;
+      else if(Jump)
+        PC <= targetPc << 2;
       else
        PC <= PC + 4;
     end
@@ -61,11 +63,13 @@ module cpu(input clock, input reset);
   // IFID pipeline register
  always @(posedge clock or negedge reset)
   begin 
-    if (reset == 1'b0 || Jump)     
-      begin
-       IFID_PCplus4 <= 32'b0;    
-       IFID_instr <= 32'b0;
+    if (reset == 1'b0 || Jump)  begin
+      if ((reset == 1'b0) || ((IDEX_Branch || IDEX_BranchCond) == 1'b0)) begin
+        IFID_PCplus4 <= 32'b0;    
+        IFID_instr <= 32'b0;
+      end
     end 
+
     else if (IFID_Write)
       begin
        IFID_PCplus4 <= PC + 32'd4;
